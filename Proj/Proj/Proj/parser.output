@@ -1,0 +1,1005 @@
+   0  $accept : %entry% $end
+
+   1  start : prog
+
+   2  prog : fundefn_list mlexp end_marker EOF
+
+   3  end_marker : SEMICOLON SEMICOLON
+
+   4  mult_exp : primary_exp_or_call
+   5           | mult_exp MUL primary_exp_or_call
+   6           | mult_exp DIV primary_exp_or_call
+   7           | mult_exp MOD primary_exp_or_call
+
+   8  additive_exp : mult_exp
+   9               | additive_exp ADD mult_exp
+  10               | additive_exp SUB mult_exp
+
+  11  compar_exp : additive_exp
+  12             | compar_exp EQ additive_exp
+  13             | compar_exp GE additive_exp
+  14             | compar_exp GT additive_exp
+  15             | compar_exp LE additive_exp
+  16             | compar_exp LT additive_exp
+  17             | compar_exp NE additive_exp
+
+  18  bool_exp : compar_exp
+  19           | compar_exp BLAND bool_exp
+  20           | compar_exp BLOR bool_exp
+
+  21  primary_exp : IDENTIFIER
+  22              | BCONSTANT
+  23              | INTCONSTANT
+  24              | LPAREN mlexp RPAREN
+
+  25  primary_exp_or_call : primary_exp_list
+
+  26  primary_exp_list : primary_exp
+  27                   | primary_exp primary_exp_list
+
+  28  mlexp : bool_exp
+  29        | IF mlexp THEN mlexp ELSE mlexp
+
+  30  fundefn : LET REC IDENTIFIER paramdecl_list COLON complex_tp EQ mlexp
+
+  31  fundefn_list : fundefn end_marker
+  32               | fundefn end_marker fundefn_list
+
+  33  paramdecl : LPAREN IDENTIFIER COLON complex_tp RPAREN
+
+  34  complex_tp : TP
+  35             | complex_tp ARROW complex_tp
+
+  36  paramdecl_list :
+  37                 | paramdecl paramdecl_list
+
+  38  %entry% : '\001' start
+
+state 0
+	$accept : . %entry% $end  (0)
+
+	'\001'  shift 1
+	.  error
+
+	%entry%  goto 2
+
+
+state 1
+	%entry% : '\001' . start  (38)
+
+	LET  shift 3
+	.  error
+
+	start  goto 4
+	prog  goto 5
+	fundefn_list  goto 6
+	fundefn  goto 7
+
+
+state 2
+	$accept : %entry% . $end  (0)
+
+	$end  accept
+
+
+state 3
+	fundefn : LET . REC IDENTIFIER paramdecl_list COLON complex_tp EQ mlexp  (30)
+
+	REC  shift 8
+	.  error
+
+
+state 4
+	%entry% : '\001' start .  (38)
+
+	.  reduce 38
+
+
+state 5
+	start : prog .  (1)
+
+	.  reduce 1
+
+
+state 6
+	prog : fundefn_list . mlexp end_marker EOF  (2)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	IF  shift 13
+	.  error
+
+	mlexp  goto 14
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 17
+	compar_exp  goto 18
+	bool_exp  goto 19
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 7
+	fundefn_list : fundefn . end_marker  (31)
+	fundefn_list : fundefn . end_marker fundefn_list  (32)
+
+	SEMICOLON  shift 22
+	.  error
+
+	end_marker  goto 23
+
+
+state 8
+	fundefn : LET REC . IDENTIFIER paramdecl_list COLON complex_tp EQ mlexp  (30)
+
+	IDENTIFIER  shift 24
+	.  error
+
+
+state 9
+	primary_exp : IDENTIFIER .  (21)
+
+	.  reduce 21
+
+
+state 10
+	primary_exp : BCONSTANT .  (22)
+
+	.  reduce 22
+
+
+state 11
+	primary_exp : INTCONSTANT .  (23)
+
+	.  reduce 23
+
+
+state 12
+	primary_exp : LPAREN . mlexp RPAREN  (24)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	IF  shift 13
+	.  error
+
+	mlexp  goto 25
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 17
+	compar_exp  goto 18
+	bool_exp  goto 19
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 13
+	mlexp : IF . mlexp THEN mlexp ELSE mlexp  (29)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	IF  shift 13
+	.  error
+
+	mlexp  goto 26
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 17
+	compar_exp  goto 18
+	bool_exp  goto 19
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 14
+	prog : fundefn_list mlexp . end_marker EOF  (2)
+
+	SEMICOLON  shift 22
+	.  error
+
+	end_marker  goto 27
+
+
+state 15
+	mult_exp : mult_exp . MUL primary_exp_or_call  (5)
+	mult_exp : mult_exp . DIV primary_exp_or_call  (6)
+	mult_exp : mult_exp . MOD primary_exp_or_call  (7)
+	additive_exp : mult_exp .  (8)
+
+	MUL  shift 28
+	DIV  shift 29
+	MOD  shift 30
+	ADD  reduce 8
+	SUB  reduce 8
+	EQ  reduce 8
+	GE  reduce 8
+	GT  reduce 8
+	LE  reduce 8
+	LT  reduce 8
+	NE  reduce 8
+	BLAND  reduce 8
+	BLOR  reduce 8
+	RPAREN  reduce 8
+	SEMICOLON  reduce 8
+	THEN  reduce 8
+	ELSE  reduce 8
+
+
+state 16
+	mult_exp : primary_exp_or_call .  (4)
+
+	.  reduce 4
+
+
+state 17
+	additive_exp : additive_exp . ADD mult_exp  (9)
+	additive_exp : additive_exp . SUB mult_exp  (10)
+	compar_exp : additive_exp .  (11)
+
+	ADD  shift 31
+	SUB  shift 32
+	EQ  reduce 11
+	GE  reduce 11
+	GT  reduce 11
+	LE  reduce 11
+	LT  reduce 11
+	NE  reduce 11
+	BLAND  reduce 11
+	BLOR  reduce 11
+	RPAREN  reduce 11
+	SEMICOLON  reduce 11
+	THEN  reduce 11
+	ELSE  reduce 11
+
+
+state 18
+	compar_exp : compar_exp . EQ additive_exp  (12)
+	compar_exp : compar_exp . GE additive_exp  (13)
+	compar_exp : compar_exp . GT additive_exp  (14)
+	compar_exp : compar_exp . LE additive_exp  (15)
+	compar_exp : compar_exp . LT additive_exp  (16)
+	compar_exp : compar_exp . NE additive_exp  (17)
+	bool_exp : compar_exp .  (18)
+	bool_exp : compar_exp . BLAND bool_exp  (19)
+	bool_exp : compar_exp . BLOR bool_exp  (20)
+
+	EQ  shift 33
+	GE  shift 34
+	GT  shift 35
+	LE  shift 36
+	LT  shift 37
+	NE  shift 38
+	BLAND  shift 39
+	BLOR  shift 40
+	RPAREN  reduce 18
+	SEMICOLON  reduce 18
+	THEN  reduce 18
+	ELSE  reduce 18
+
+
+state 19
+	mlexp : bool_exp .  (28)
+
+	.  reduce 28
+
+
+state 20
+	primary_exp_list : primary_exp .  (26)
+	primary_exp_list : primary_exp . primary_exp_list  (27)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	ADD  reduce 26
+	SUB  reduce 26
+	MUL  reduce 26
+	DIV  reduce 26
+	MOD  reduce 26
+	EQ  reduce 26
+	GE  reduce 26
+	GT  reduce 26
+	LE  reduce 26
+	LT  reduce 26
+	NE  reduce 26
+	BLAND  reduce 26
+	BLOR  reduce 26
+	RPAREN  reduce 26
+	SEMICOLON  reduce 26
+	THEN  reduce 26
+	ELSE  reduce 26
+
+	primary_exp  goto 20
+	primary_exp_list  goto 41
+
+
+state 21
+	primary_exp_or_call : primary_exp_list .  (25)
+
+	.  reduce 25
+
+
+state 22
+	end_marker : SEMICOLON . SEMICOLON  (3)
+
+	SEMICOLON  shift 42
+	.  error
+
+
+state 23
+	fundefn_list : fundefn end_marker .  (31)
+	fundefn_list : fundefn end_marker . fundefn_list  (32)
+
+	LET  shift 3
+	IDENTIFIER  reduce 31
+	BCONSTANT  reduce 31
+	INTCONSTANT  reduce 31
+	LPAREN  reduce 31
+	IF  reduce 31
+
+	fundefn_list  goto 43
+	fundefn  goto 7
+
+
+state 24
+	fundefn : LET REC IDENTIFIER . paramdecl_list COLON complex_tp EQ mlexp  (30)
+	paramdecl_list : .  (36)
+
+	LPAREN  shift 44
+	COLON  reduce 36
+
+	paramdecl_list  goto 45
+	paramdecl  goto 46
+
+
+state 25
+	primary_exp : LPAREN mlexp . RPAREN  (24)
+
+	RPAREN  shift 47
+	.  error
+
+
+state 26
+	mlexp : IF mlexp . THEN mlexp ELSE mlexp  (29)
+
+	THEN  shift 48
+	.  error
+
+
+state 27
+	prog : fundefn_list mlexp end_marker . EOF  (2)
+
+	EOF  shift 49
+	.  error
+
+
+state 28
+	mult_exp : mult_exp MUL . primary_exp_or_call  (5)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	primary_exp_or_call  goto 50
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 29
+	mult_exp : mult_exp DIV . primary_exp_or_call  (6)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	primary_exp_or_call  goto 51
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 30
+	mult_exp : mult_exp MOD . primary_exp_or_call  (7)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	primary_exp_or_call  goto 52
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 31
+	additive_exp : additive_exp ADD . mult_exp  (9)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 53
+	primary_exp_or_call  goto 16
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 32
+	additive_exp : additive_exp SUB . mult_exp  (10)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 54
+	primary_exp_or_call  goto 16
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 33
+	compar_exp : compar_exp EQ . additive_exp  (12)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 55
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 34
+	compar_exp : compar_exp GE . additive_exp  (13)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 56
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 35
+	compar_exp : compar_exp GT . additive_exp  (14)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 57
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 36
+	compar_exp : compar_exp LE . additive_exp  (15)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 58
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 37
+	compar_exp : compar_exp LT . additive_exp  (16)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 59
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 38
+	compar_exp : compar_exp NE . additive_exp  (17)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 60
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 39
+	bool_exp : compar_exp BLAND . bool_exp  (19)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 17
+	compar_exp  goto 18
+	bool_exp  goto 61
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 40
+	bool_exp : compar_exp BLOR . bool_exp  (20)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	.  error
+
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 17
+	compar_exp  goto 18
+	bool_exp  goto 62
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 41
+	primary_exp_list : primary_exp primary_exp_list .  (27)
+
+	.  reduce 27
+
+
+state 42
+	end_marker : SEMICOLON SEMICOLON .  (3)
+
+	.  reduce 3
+
+
+state 43
+	fundefn_list : fundefn end_marker fundefn_list .  (32)
+
+	.  reduce 32
+
+
+state 44
+	paramdecl : LPAREN . IDENTIFIER COLON complex_tp RPAREN  (33)
+
+	IDENTIFIER  shift 63
+	.  error
+
+
+state 45
+	fundefn : LET REC IDENTIFIER paramdecl_list . COLON complex_tp EQ mlexp  (30)
+
+	COLON  shift 64
+	.  error
+
+
+state 46
+	paramdecl_list : paramdecl . paramdecl_list  (37)
+	paramdecl_list : .  (36)
+
+	LPAREN  shift 44
+	COLON  reduce 36
+
+	paramdecl_list  goto 65
+	paramdecl  goto 46
+
+
+state 47
+	primary_exp : LPAREN mlexp RPAREN .  (24)
+
+	.  reduce 24
+
+
+state 48
+	mlexp : IF mlexp THEN . mlexp ELSE mlexp  (29)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	IF  shift 13
+	.  error
+
+	mlexp  goto 66
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 17
+	compar_exp  goto 18
+	bool_exp  goto 19
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 49
+	prog : fundefn_list mlexp end_marker EOF .  (2)
+
+	.  reduce 2
+
+
+state 50
+	mult_exp : mult_exp MUL primary_exp_or_call .  (5)
+
+	.  reduce 5
+
+
+state 51
+	mult_exp : mult_exp DIV primary_exp_or_call .  (6)
+
+	.  reduce 6
+
+
+state 52
+	mult_exp : mult_exp MOD primary_exp_or_call .  (7)
+
+	.  reduce 7
+
+
+state 53
+	mult_exp : mult_exp . MUL primary_exp_or_call  (5)
+	mult_exp : mult_exp . DIV primary_exp_or_call  (6)
+	mult_exp : mult_exp . MOD primary_exp_or_call  (7)
+	additive_exp : additive_exp ADD mult_exp .  (9)
+
+	MUL  shift 28
+	DIV  shift 29
+	MOD  shift 30
+	ADD  reduce 9
+	SUB  reduce 9
+	EQ  reduce 9
+	GE  reduce 9
+	GT  reduce 9
+	LE  reduce 9
+	LT  reduce 9
+	NE  reduce 9
+	BLAND  reduce 9
+	BLOR  reduce 9
+	RPAREN  reduce 9
+	SEMICOLON  reduce 9
+	THEN  reduce 9
+	ELSE  reduce 9
+
+
+state 54
+	mult_exp : mult_exp . MUL primary_exp_or_call  (5)
+	mult_exp : mult_exp . DIV primary_exp_or_call  (6)
+	mult_exp : mult_exp . MOD primary_exp_or_call  (7)
+	additive_exp : additive_exp SUB mult_exp .  (10)
+
+	MUL  shift 28
+	DIV  shift 29
+	MOD  shift 30
+	ADD  reduce 10
+	SUB  reduce 10
+	EQ  reduce 10
+	GE  reduce 10
+	GT  reduce 10
+	LE  reduce 10
+	LT  reduce 10
+	NE  reduce 10
+	BLAND  reduce 10
+	BLOR  reduce 10
+	RPAREN  reduce 10
+	SEMICOLON  reduce 10
+	THEN  reduce 10
+	ELSE  reduce 10
+
+
+state 55
+	additive_exp : additive_exp . ADD mult_exp  (9)
+	additive_exp : additive_exp . SUB mult_exp  (10)
+	compar_exp : compar_exp EQ additive_exp .  (12)
+
+	ADD  shift 31
+	SUB  shift 32
+	EQ  reduce 12
+	GE  reduce 12
+	GT  reduce 12
+	LE  reduce 12
+	LT  reduce 12
+	NE  reduce 12
+	BLAND  reduce 12
+	BLOR  reduce 12
+	RPAREN  reduce 12
+	SEMICOLON  reduce 12
+	THEN  reduce 12
+	ELSE  reduce 12
+
+
+state 56
+	additive_exp : additive_exp . ADD mult_exp  (9)
+	additive_exp : additive_exp . SUB mult_exp  (10)
+	compar_exp : compar_exp GE additive_exp .  (13)
+
+	ADD  shift 31
+	SUB  shift 32
+	EQ  reduce 13
+	GE  reduce 13
+	GT  reduce 13
+	LE  reduce 13
+	LT  reduce 13
+	NE  reduce 13
+	BLAND  reduce 13
+	BLOR  reduce 13
+	RPAREN  reduce 13
+	SEMICOLON  reduce 13
+	THEN  reduce 13
+	ELSE  reduce 13
+
+
+state 57
+	additive_exp : additive_exp . ADD mult_exp  (9)
+	additive_exp : additive_exp . SUB mult_exp  (10)
+	compar_exp : compar_exp GT additive_exp .  (14)
+
+	ADD  shift 31
+	SUB  shift 32
+	EQ  reduce 14
+	GE  reduce 14
+	GT  reduce 14
+	LE  reduce 14
+	LT  reduce 14
+	NE  reduce 14
+	BLAND  reduce 14
+	BLOR  reduce 14
+	RPAREN  reduce 14
+	SEMICOLON  reduce 14
+	THEN  reduce 14
+	ELSE  reduce 14
+
+
+state 58
+	additive_exp : additive_exp . ADD mult_exp  (9)
+	additive_exp : additive_exp . SUB mult_exp  (10)
+	compar_exp : compar_exp LE additive_exp .  (15)
+
+	ADD  shift 31
+	SUB  shift 32
+	EQ  reduce 15
+	GE  reduce 15
+	GT  reduce 15
+	LE  reduce 15
+	LT  reduce 15
+	NE  reduce 15
+	BLAND  reduce 15
+	BLOR  reduce 15
+	RPAREN  reduce 15
+	SEMICOLON  reduce 15
+	THEN  reduce 15
+	ELSE  reduce 15
+
+
+state 59
+	additive_exp : additive_exp . ADD mult_exp  (9)
+	additive_exp : additive_exp . SUB mult_exp  (10)
+	compar_exp : compar_exp LT additive_exp .  (16)
+
+	ADD  shift 31
+	SUB  shift 32
+	EQ  reduce 16
+	GE  reduce 16
+	GT  reduce 16
+	LE  reduce 16
+	LT  reduce 16
+	NE  reduce 16
+	BLAND  reduce 16
+	BLOR  reduce 16
+	RPAREN  reduce 16
+	SEMICOLON  reduce 16
+	THEN  reduce 16
+	ELSE  reduce 16
+
+
+state 60
+	additive_exp : additive_exp . ADD mult_exp  (9)
+	additive_exp : additive_exp . SUB mult_exp  (10)
+	compar_exp : compar_exp NE additive_exp .  (17)
+
+	ADD  shift 31
+	SUB  shift 32
+	EQ  reduce 17
+	GE  reduce 17
+	GT  reduce 17
+	LE  reduce 17
+	LT  reduce 17
+	NE  reduce 17
+	BLAND  reduce 17
+	BLOR  reduce 17
+	RPAREN  reduce 17
+	SEMICOLON  reduce 17
+	THEN  reduce 17
+	ELSE  reduce 17
+
+
+state 61
+	bool_exp : compar_exp BLAND bool_exp .  (19)
+
+	.  reduce 19
+
+
+state 62
+	bool_exp : compar_exp BLOR bool_exp .  (20)
+
+	.  reduce 20
+
+
+state 63
+	paramdecl : LPAREN IDENTIFIER . COLON complex_tp RPAREN  (33)
+
+	COLON  shift 67
+	.  error
+
+
+state 64
+	fundefn : LET REC IDENTIFIER paramdecl_list COLON . complex_tp EQ mlexp  (30)
+
+	TP  shift 68
+	.  error
+
+	complex_tp  goto 69
+
+
+state 65
+	paramdecl_list : paramdecl paramdecl_list .  (37)
+
+	.  reduce 37
+
+
+state 66
+	mlexp : IF mlexp THEN mlexp . ELSE mlexp  (29)
+
+	ELSE  shift 70
+	.  error
+
+
+state 67
+	paramdecl : LPAREN IDENTIFIER COLON . complex_tp RPAREN  (33)
+
+	TP  shift 68
+	.  error
+
+	complex_tp  goto 71
+
+
+state 68
+	complex_tp : TP .  (34)
+
+	.  reduce 34
+
+
+state 69
+	fundefn : LET REC IDENTIFIER paramdecl_list COLON complex_tp . EQ mlexp  (30)
+	complex_tp : complex_tp . ARROW complex_tp  (35)
+
+	EQ  shift 72
+	ARROW  shift 73
+	.  error
+
+
+state 70
+	mlexp : IF mlexp THEN mlexp ELSE . mlexp  (29)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	IF  shift 13
+	.  error
+
+	mlexp  goto 74
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 17
+	compar_exp  goto 18
+	bool_exp  goto 19
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 71
+	paramdecl : LPAREN IDENTIFIER COLON complex_tp . RPAREN  (33)
+	complex_tp : complex_tp . ARROW complex_tp  (35)
+
+	RPAREN  shift 75
+	ARROW  shift 73
+	.  error
+
+
+state 72
+	fundefn : LET REC IDENTIFIER paramdecl_list COLON complex_tp EQ . mlexp  (30)
+
+	IDENTIFIER  shift 9
+	BCONSTANT  shift 10
+	INTCONSTANT  shift 11
+	LPAREN  shift 12
+	IF  shift 13
+	.  error
+
+	mlexp  goto 76
+	mult_exp  goto 15
+	primary_exp_or_call  goto 16
+	additive_exp  goto 17
+	compar_exp  goto 18
+	bool_exp  goto 19
+	primary_exp  goto 20
+	primary_exp_list  goto 21
+
+
+state 73
+	complex_tp : complex_tp ARROW . complex_tp  (35)
+
+	TP  shift 68
+	.  error
+
+	complex_tp  goto 77
+
+
+state 74
+	mlexp : IF mlexp THEN mlexp ELSE mlexp .  (29)
+
+	.  reduce 29
+
+
+state 75
+	paramdecl : LPAREN IDENTIFIER COLON complex_tp RPAREN .  (33)
+
+	.  reduce 33
+
+
+state 76
+	fundefn : LET REC IDENTIFIER paramdecl_list COLON complex_tp EQ mlexp .  (30)
+
+	.  reduce 30
+
+
+state 77
+	complex_tp : complex_tp . ARROW complex_tp  (35)
+	complex_tp : complex_tp ARROW complex_tp .  (35)
+
+	ARROW  shift 73
+	EQ  reduce 35
+	RPAREN  reduce 35
+
+
+44 terminals, 18 nonterminals
+39 grammar rules, 78 states
