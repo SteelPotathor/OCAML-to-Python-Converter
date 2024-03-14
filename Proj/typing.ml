@@ -39,3 +39,5 @@ let rec tp_expr env = function
 
 (* TODO: implement *)
 let tp_prog (Prog (fdfs, e)) = IntT
+
+let tp_fdefn env f 
