@@ -13,7 +13,7 @@ let tp_const = function
     | BoolV _ -> BoolT
     | IntV _ -> IntT;;
 
-let rec search_tp_localvar v env = let rec aux = function
+let search_tp_localvar v env = let rec aux = function
 	| (a, b)::c -> if v = a then b else aux c
     	| _ -> raise NotFound
 in aux env;; 
