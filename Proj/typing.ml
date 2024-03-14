@@ -14,14 +14,14 @@ let tp_const = function
     | IntV _ -> IntT;;
 
 let rec search_tp_localvar v env = let rec aux = function
-	|(a, b)::c -> if v = a then b else aux c
-    |_ -> raise NotFound
+	| (a, b)::c -> if v = a then b else aux c
+    	| _ -> raise NotFound
 in aux env;; 
 
 (* AIDE Tim => (vname * fpdecl = tp * vname * (vardecl list = vname * tp) list) c'est quoi fpdecl? *)
 let search_tp_funbind v env = let rec aux = function
-	|(a, b)::c -> if v = a then fst b else aux c
-	|_ -> raise NotFound
+	| (a, b)::c -> if v = a then fst b else aux c
+	| _ -> raise NotFound
 in aux env;; 
 
 let tp_var env v = try search_tp_var v env.localvar with | NotFound -> try search_tp_funbind v env.funbind with | NotFound -> failwith "echec de typage, la variable n'est pas dans l'environnement";;
