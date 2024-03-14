@@ -35,7 +35,7 @@ let rec tp_expr env = function
                                        | BCompar b ->  if tp_expr env e1 = tp_expr env e2 then BoolT else failwith "echec de typage, les comparaisons doivent être de même type"
                                        | BLogic b -> let t1 = tp_expr env e1 in if t1 = BoolT && t1 = tp_expr env e2 then BoolT else failwith "echec de typage, les opérations logiques se font sur des bool"
     | IfThenElse(e1, e2, e3) -> (if tp_expr env e1 = BoolT then let t2 = tp_expr env e2 in (if t2 = tp_expr env e3 then t2 else failwith "echec de typage, then et else n'ont pas le même type") else failwith "echec de typage, if n'est pas un booléen")
-    | CallE el -> let tl=List.map tp_expr el in  
+    | CallE el -> let tl=List.map tp_expr el in  (* Demander explication complète au prof avec exemple *)
 
 (* TODO: implement *)
 let tp_prog (Prog (fdfs, e)) = IntT
