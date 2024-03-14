@@ -37,7 +37,7 @@ let rec tp_expr env = function
     | IfThenElse(e1, e2, e3) -> (if tp_expr env e1 = BoolT then let t2 = tp_expr env e2 in (if t2 = tp_expr env e3 then t2 else failwith "echec de typage, then et else n'ont pas le même type") else failwith "echec de typage, if n'est pas un booléen")
     | CallE el -> let tl=List.map tp_expr el in  (* Demander explication complète au prof avec exemple *)
 
-(* TODO: implement *)
+(* TODO: implement rien compris aux fonctions ci-dessous *)
 let tp_prog (Prog (fdfs, e)) = IntT
 
 let tp_fdefn env f 
