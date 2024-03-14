@@ -13,10 +13,18 @@ let tp_const = function
     | BoolV _ -> BoolT
     | IntV _ -> IntT;;
 
-let rec search_tp_var = fun(v, ((a, b)::env)) -> if v = a then b else search_tp_var(v, env)
-    |_ -> raise NotFound;; 
+let rec search_tp_localvar v env = let rec aux = function
+	|(a, b)::c -> if v = a then b else aux c
+    |_ -> raise NotFound
+in aux env;; 
 
-let tp_var env v = try search_tp_var(v, env.localvar) with | NotFound -> failwith "echec de typage";;
+(* AIDE Tim => (vname * fpdecl = tp * vname * (vardecl list = vname * tp) list) c'est quoi fpdecl? *)
+let search_tp_funbind v env = let rec aux = function
+	|(a, b)::c -> if v = a then fst b else aux c
+	|_ -> raise NotFound
+in aux env;; 
+
+let tp_var env v = try search_tp_var v env.localvar with | NotFound -> try search_tp_funbind v env.funbind with | NotFound -> failwith "echec de typage, la variable n'est pas dans l'environnement";;
 
 let rec function_type_correct = fun (tf, targs) -> match tf,targs with FunT (a,b),(ta::reste) -> a=ta && function_type_correct(b, reste)
                                                      |_ -> true;;
