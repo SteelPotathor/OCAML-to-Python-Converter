@@ -16,9 +16,7 @@ let tp_const = function
 let rec search_tp_var = fun(v, ((a, b)::env)) -> if v = a then b else search_tp_var(v, env)
     |_ -> raise NotFound;; 
 
-let tp_var env v = try search_tp_var v env.localvar with | NotFound -> failwith "echec de typage";;
-
-let tp_bin = function;;
+let tp_var env v = try search_tp_var(v, env.localvar) with | NotFound -> failwith "echec de typage";;
 
 let rec function_type_correct = fun (tf, targs) -> match tf,targs with FunT (a,b),(ta::reste) -> a=ta && function_type_correct(b, reste)
                                                      |_ -> true;;
