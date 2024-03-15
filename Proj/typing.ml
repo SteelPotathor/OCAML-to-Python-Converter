@@ -59,3 +59,11 @@ let verif_fun
 
 (*  *)
 let tp_fdefn env f = 
+
+(* e1=tp_expr env f[0]
+e2=List.map tpexpr env f[1:]
+tester si e1 est une fonction
+tp_app(int->bool->x) [int; bool]
+=> tp_app(bool->x) [bool]
+=> tp_app(x) [] : ok typage bon sinon si x est un type alors on renvoie le type de x
+si liste non vide mais x alors erreur trop d'args *) 
