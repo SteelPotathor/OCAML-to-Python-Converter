@@ -1,73 +1,76 @@
-open Lang
-  
-(* Environments *)
+type vname = string
 
-type environment = 
-    {localvar: (vname * tp) list; 
-     funbind: (vname * fpdecl) list}
+(* binary arithmetic operators: +, -, *, /, mod *)
+type barith = BAadd | BAsub | BAmul | BAdiv | BAmod
 
-exception NotFound;;
+(* binary comparison operators: =, >=, >, <=, <, != *)
+type bcompar = BCeq | BCge | BCgt | BCle | BClt | BCne
 
-let tp_const = function
-    | BoolV _ -> BoolT
-    | IntV _ -> IntT;;
+(* binary logic operators *)
+type blogic = BLand | BLor
 
-let search_tp_localvar v env = 
-    let rec aux = function
-        | (a, b)::c -> if v = a then b else aux c
-        | _ -> raise NotFound
-in aux env;; 
+(* binary operators, combining all of the above *)
+type binop =
+    BArith of barith
+  | BCompar of bcompar
+  | BLogic of blogic
 
-(* AIDE Tim => (vname * fpdecl = tp * vname * (vardecl list = vname * tp) list) c'est quoi fpdecl? *)
-let search_tp_funbind v env = 
-    let rec aux = function
-        | (a, b)::c -> if v = a then fst b else aux c
-        | _ -> raise NotFound
-in aux env;; 
+type value =
+    BoolV of bool
+  | IntV of int
+  | UndefV (* TODO: really keep? *)
+    
+(* expresssions *)
+type expr = 
+    Const of value                     (* constant *)
+  | VarE  of vname                     (* variable *)
+  | BinOp of binop * expr * expr       (* binary operation *)
+  | IfThenElse of expr * expr * expr   (* if - then - else *)
+  (* function call. The parser ensures that the expr list is always non-empty *)
+  | CallE of (expr list)
 
-let type_creation = function 
-    | FPdecl(t_retour, _, (Vardecl(a, b)::c)) -> 
-        let rec aux = function 
-            | (Vardecl(a, b)) -> b
-    		| (Vardecl(a, b)::c) -> FunT(b, aux c) 
-    in FunT(aux c, t_retour)
-    | FPdecl(t_retour, _, _) -> t_retour;;
+(* commands *)
+type cmd =
+    Skip                                  (* empty command, does nothing *)
+  | Assign of (vname list) * (expr list)  (* parallel assignment *)
+  | Seq of cmd * cmd                      (* sequence of commands *)
+  | Cond of expr * cmd * cmd              (* conditional command(!), compare with IfThenElse *)
+  | While of expr * cmd                   (* while loop *)
+  | Return of expr                        (* return from current procedure *)
 
-let tp_var env v = try type_creation (search_tp_var v env.localvar) with | NotFound -> try type_creation (search_tp_funbind v env.funbind) with | NotFound -> failwith "echec de typage, la variable n'est pas dans l'environnement";;
+(* Types *)
+type tp = BoolT | IntT | FunT of tp * tp
 
-let rec function_type_correct tf tparam = match tparam with 
-    | (a::b) -> match tf with | FunT(t1, t2) -> if t1 = a then function_type_correct t2 b else failwith "erreur le type du paramètre et le type de la fonction ne correspondent pas"
-                              | _ -> failwith "erreur application d'une non fonction"
-    | [] -> tf;; 
+let numeric_tp = function
+    IntT -> true
+  | _ -> false
 
-let rec tp_expr env = function
-    | Const c -> tp_const c 
-    | VarE v -> tp_var env v
-    | BinOp(b, e1, e2) -> match b with | BArith b -> let t1 = tp_expr env e1 in if t1 = IntT && t1 = tp_expr env e2 then t1 else failwith "echec de typage, les opérations arithmétiques se font sur des int" 
-                                       | BCompar b ->  if tp_expr env e1 = tp_expr env e2 then BoolT else failwith "echec de typage, les comparaisons doivent être de même type"
-                                       | BLogic b -> let t1 = tp_expr env e1 in if t1 = BoolT && t1 = tp_expr env e2 then BoolT else failwith "echec de typage, les opérations logiques se font sur des bool"
-    | IfThenElse(e1, e2, e3) -> (if tp_expr env e1 = BoolT then let t2 = tp_expr env e2 in (if t2 = tp_expr env e3 then t2 else failwith "echec de typage, then et else n'ont pas le même type") else failwith "echec de typage, if n'est pas un booléen")
-    | CallE(a::b) -> let tf = tp_expr env a and tparam = List.map (tp_expr env) b in function_type_correct tf tparam
-    | CallE(_) -> failwith "erreur";;
+let base_tp = function
+    FunT(_, _) -> false
+  | _ -> true
 
+(* variable / parameter declaration *)
+type vardecl = Vardecl of vname * tp
 
-(* fdfs est une liste de fpdefn *)
-let fun_bind fdfs = List.map (fun (Fundefn(fd, _)) -> (name_of_fpdecl fd, fd) ) fdfs;;
+let name_of_vardecl (Vardecl (vn, _)) = vn
 
-let environment_initial fdfs = {localvar = []; funbind = fun_bind fdfs};;
+let tp_of_vardecl (Vardecl (_, t)) = t
 
-(* TODO: implement *)
-let tp_prog (Prog (fdfs, e)) = let initial = environment_initial fdfs in tp_expr initial e;;
+(* function declaration: return type; parameter declarations *)
+type fpdecl = FPdecl of tp * vname * (vardecl list)
 
-let verif_fun 
+let name_of_fpdecl (FPdecl (t, fn, pds)) = fn
+let params_of_fpdecl (FPdecl (t, fn, pds)) = pds
 
-(* verif l'interieur de la fonction *)
-let tp_fdefn env f = 
+(* function definition: function declaration; local var decls; function body *)
+type fpdefn =
+    Fundefn of fpdecl * expr  (* function definition:  header, expression *)
+  | Procdefn of fpdecl * cmd  (* procedure definition: header, command *)
 
-(* e1=tp_expr env f[0]
-e2=List.map tpexpr env f[1:]
-tester si e1 est une fonction
-tp_app(int->bool->x) [int; bool]
-=> tp_app(bool->x) [bool]
-=> tp_app(x) [] : ok typage bon sinon si x est un type alors on renvoie le type de x
-si liste non vide mais x alors erreur trop d'args *) 
+let fpdecl_of_fpdefn = function
+  Fundefn(fd, _) -> fd
+  | Procdefn (fd, _) -> fd
+let name_of_fpdefn fpd = name_of_fpdecl (fpdecl_of_fpdefn fpd)
+
+(* program: function definitions and expression to be evaluated *)
+type prog = Prog of (fpdefn list) * expr
