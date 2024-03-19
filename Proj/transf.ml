@@ -5,7 +5,7 @@ open Lang
 
 module StringSet = Set.Make(String)
 
-let rec present f e = 
+let present f e = 
     let rec aux = function 
                         | VarE(e) -> f <> e 
                         | CallE(a::b) -> aux a && aux b 
@@ -13,8 +13,8 @@ let rec present f e =
 in aux e;;
 
 (* f = v name; e = expr *)
-let is_tailrec_expr f = function 
-                            | IfThenElse(e1, e2, e3) -> match e1 with CallE(a) -> present f a && is_tailrec_expr f e2 && is_tailrec_expr f e3 
+let rec is_tailrec_expr f = function 
+                            | IfThenElse(e1, e2, e3) -> match e1 with CallE(a) -> present f a | _ -> true && is_tailrec_expr f e2 && is_tailrec_expr f e3 
                             | CallE(a::b) -> present f b 
                             | _ -> true (* on ne peut jamais croiser un VarE sinon mauvais typage ni d'opérations (même raison) *);;
                             
