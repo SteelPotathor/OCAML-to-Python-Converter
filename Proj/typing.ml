@@ -47,7 +47,7 @@ let rec tp_expr env = function
                                        | BLogic b -> let t1 = tp_expr env e1 in if t1 = BoolT && t1 = tp_expr env e2 then BoolT else failwith "echec de typage, les opérations logiques se font sur des bool"
     | IfThenElse(e1, e2, e3) -> (if tp_expr env e1 = BoolT then let t2 = tp_expr env e2 in (if t2 = tp_expr env e3 then t2 else failwith "echec de typage, then et else n'ont pas le même type") else failwith "echec de typage, if n'est pas un booléen")
     | CallE(a::b) -> let tf = tp_expr env a and tparam = List.map (tp_expr env) b in function_type_correct tf tparam
-    | CallE(_) -> failwith "erreur";;
+    | CallE(_) -> failwith "erreur" (* est censée ne jamais être vide *);;
 
 
 let fun_bind fdfs = List.map (fun (Fundefn(fd, _)) -> (name_of_fpdecl fd, fd) ) fdfs;;
