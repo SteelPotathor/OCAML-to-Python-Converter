@@ -24,3 +24,31 @@ let rec names_expr = StringSet.empty
 (* TODO: implement *)
 let transf_prog (Prog(fdfs, e)) = Prog(fdfs, e)
 
+(* brouillon correct *)
+let rec convert f l = function
+| IfThenElse(e1, e2, e3) -> Cond(e1, convert f l e2, convert f l e3)
+| CallE(a::b) -> if f = a then Assign(l, b) else Skip  (* clarification par rapport à l'enoncé requise, skip? seq? *)
+| x -> Return(x);;
+
+let transf_expr f l e = if is_tailrec_expr f e then While(Const(BoolV(true)), convert f l e) else failwith "la fonction n'est pas récursive terminale";;
+
+let transf_fpdefn = function
+| Fundefn((tp, name, l), e) ->(* def? quel type use*) transf_expr name l e
+| Procdefn((tp, name, l), e) -> e;;  
+
+let transf_prog = 
+
+let rec factr (n : int) (acc: int) : int =
+if n = 0
+then acc
+else factr (n - 1) (n * acc)
+;;
+factr 5 1;;
+
+def factr (n,acc) :
+while True :
+if (n == 0) :
+return(acc)
+else :
+(n,acc )=((n - 1),(n * acc ))
+factr (5 ,1)
