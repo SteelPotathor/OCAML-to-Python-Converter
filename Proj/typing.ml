@@ -54,10 +54,9 @@ let fun_bind fdfs = List.map (fun (Fundefn(fd, _)) -> (name_of_fpdecl fd, fd) ) 
 
 let environment_initial fdfs = {localvar = []; funbind = fun_bind fdfs};;
 
-let tp_prog (Prog (fdfs, e)) = let initial = environment_initial fdfs in tp_expr initial e;;
-
-(* verifie l'interieur de la fonction *)
-let verif_fun 
+let tp_prog (Prog (fdfs, e)) = let initial = environment_initial fdfs in List.map (tp_defn initial e) (* use tp_defn sur toutes les fonctions de e *);;
 
 (* ajoute une fonction à l'env et verifie son expression *)
-let tp_fdefn env f = 
+let tp_fdefn env f = (f, tp_expr  env f)::env.localvar;;
+
+(* si verif incorrecte => exception *)
