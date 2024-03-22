@@ -57,7 +57,10 @@ let environment_initial fdfs = {localvar = []; funbind = fun_bind fdfs};;
 let tp_prog (Prog (fdfs, e)) = let initial = environment_initial fdfs in List.for_all (fun fd -> tp_defn initial fd) fdfs ;;
 
 (* ajoute une fonction (déclaration) à l'env et verifie son expression renvoie un bool *)
-let tp_fdefn env f = (f, tp_expr env f)::env.localvar;;
+let tp_fdefn env f = 
+    let envlocal = env{localvar = declarations_de f}
+
+(f, tp_expr env f)::env.localvar;;
 
 (* si verif incorrecte => exception *)
 
