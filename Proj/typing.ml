@@ -54,9 +54,20 @@ let fun_bind fdfs = List.map (fun (Fundefn(fd, _)) -> (name_of_fpdecl fd, fd) ) 
 
 let environment_initial fdfs = {localvar = []; funbind = fun_bind fdfs};;
 
-let tp_prog (Prog (fdfs, e)) = let initial = environment_initial fdfs in List.map (tp_defn initial e) (* use tp_defn sur toutes les fonctions de e *);;
+let tp_prog (Prog (fdfs, e)) = let initial = environment_initial fdfs in List.for_all (fun fd -> tp_defn initial fd) fdfs ;;
 
-(* ajoute une fonction à l'env et verifie son expression *)
-let tp_fdefn env f = (f, tp_expr  env f)::env.localvar;;
+(* ajoute une fonction (déclaration) à l'env et verifie son expression renvoie un bool *)
+let tp_fdefn env f = (f, tp_expr env f)::env.localvar;;
 
 (* si verif incorrecte => exception *)
+
+
+
+
+(* recuperer toutes les vraibales d'une epxr et vérifier que f n'est pas présent 
+
+header => juste virer le type de retour
+
+transformation => rien bouger si recursif non terminale
+
+tout tester, ne pas prendre de risques *)
