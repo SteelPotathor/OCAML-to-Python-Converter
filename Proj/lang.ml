@@ -18,7 +18,7 @@ type binop =
 type value =
     BoolV of bool
   | IntV of int
-  | UndefV (* TODO: really keep? *)
+  | UndefV
     
 (* expresssions *)
 type expr = 
