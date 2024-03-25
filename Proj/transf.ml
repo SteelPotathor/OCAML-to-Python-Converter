@@ -50,7 +50,7 @@ let transf_fpdefn = function
 | Fundefn((tp, name, l), e) -> transf_expr name (List.map (name_of_vardecl) l) e
 | Procdefn((tp, name, l), c) -> c;;  
 
-let transf_prog Prog(l, e) = Prog(List.map (transf_fpdefn) l), transf_expr e)   
+let transf_prog Prog(fdfs, e) = Prog(List.map transf_fpdefn fdfs), e)   
 
 
 
