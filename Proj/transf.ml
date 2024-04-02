@@ -31,15 +31,18 @@ let rec convert_tailrec l e =
         | x -> Return(x)
     in aux e;;
 
+exception NotTailRec;;
 
-(* transform a tail recursive expression into a command (not recursive) *)
+(* transform an expression e into a command if f is tail recursive *)
 let transf_expr f l e = 
     if is_tailrec_expr f e then
         While(Const(BoolV(true)), convert_tailrec l e) 
-    else failwith "function not tail recursive, can't transform it";;
+    else raise NotTailRec;;
 
+(* transform a function/procedure definition *)
 let transf_fpdefn = function
-| Fundefn((tp, name, l), e) -> transf_expr name (List.map name_of_vardecl l) e
-| Procdefn((tp, name, l), c) -> c;;  
+| Fundefn(FPdecl(tp, name, l), e) -> try Procdefn(FPdecl(tp, name, l), transf_expr name (List.map name_of_vardecl l) e) with NotTailRec -> Fundefn(FPdecl(tp, name, l), e)
+| Procdefn _ as p -> p;;  
 
-let transf_prog Prog(fdfs, e) = Prog(List.map transf_fpdefn fdfs), e);;
+(* transform a program *)
+let transf_prog Prog(fdfs, e) = Prog(List.map transf_fpdefn fdfs, e);;

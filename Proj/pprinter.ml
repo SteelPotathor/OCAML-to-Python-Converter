@@ -59,7 +59,6 @@ let rec doc_of_expr = function
   | CallE(_) -> empty
 and doc_of_expr_list es = parens (separate_map comma doc_of_expr es)
     
-(* TODO: to be completed *)
 let rec doc_of_cmd = function
     Skip -> empty
   | Assign(vs, es) -> doc_of_var_list vs ^^ equals ^^ doc_of_expr_list es
@@ -78,7 +77,6 @@ let rec doc_of_cmd = function
   | Return(e) -> string "return" doc_of_expr e
 
 
-(* TODO: to be completed *)
 let doc_of_fpdefn  = function
     Fundefn(FPdecl(rt, fn, params), e) ->
       (separate space [string "def"; string fn;
