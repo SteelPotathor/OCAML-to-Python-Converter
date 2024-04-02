@@ -1,4 +1,4 @@
-  (* Transformation of Caml code to Python code *)
+ (* Transformation of Caml code to Python code *)
 
 open Lang
 
@@ -23,10 +23,7 @@ let rec is_tailrec_expr f = function
 
                             
 
-(* TODO: implement *)
-let transf_prog (Prog(fdfs, e)) = Prog(fdfs, e)
-
-(* brouillon incorrect *)
+(* à tester, potentiel pb sur callE, un appel n'est pas forcément récursif? *)
 let rec convert_tailrec l e = 
     let rec aux = function
         | IfThenElse(e1, e2, e3) -> Cond(e1, aux e2, aux e3)
@@ -34,30 +31,15 @@ let rec convert_tailrec l e =
         | x -> Return(x)
     in aux e;;
 
-(* transf_expr que faire si f n'est pas tail rec? doit on quand même transformer en cmd? *)
-let rec convert = function
-| BinOP(op, e1, e2) -> Return()
-| IfThenElse(e1, e2, e3) -> Cond(e1, convert e2, convert e3)
-| CallE
 
 (* transform a tail recursive expression into a command (not recursive) *)
 let transf_expr f l e = 
     if is_tailrec_expr f e then
         While(Const(BoolV(true)), convert_tailrec l e) 
-    else f (* que faire dans le else? *);;
+    else failwith "function not tail recursive, can't transform it";;
 
 let transf_fpdefn = function
-| Fundefn((tp, name, l), e) -> transf_expr name (List.map (name_of_vardecl) l) e
+| Fundefn((tp, name, l), e) -> transf_expr name (List.map name_of_vardecl l) e
 | Procdefn((tp, name, l), c) -> c;;  
 
-let transf_prog Prog(fdfs, e) = Prog(List.map transf_fpdefn fdfs), e)   
-
-
-
-(* recuperer toutes les vraibales d'une epxr et vérifier que f n'est pas présent 
-
-header => juste virer le type de retour
-
-transformation => rien bouger si recursif non terminale
-
-tout tester, ne pas prendre de risques *)
+let transf_prog Prog(fdfs, e) = Prog(List.map transf_fpdefn fdfs), e);;
