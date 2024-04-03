@@ -18,7 +18,7 @@ let rec is_tailrec_expr f = function
         | VarE e -> f <> e
         | CallE(a::b) -> not(StringSet.mem f (names_expr b))
         | BinOp(op,e1,e2) -> not(StringSet.mem f names_expr(e1)) && not(StringSet.mem f names_expr(e2))
-        | IfThenElse(e1,e2,e3) -> not(StringSet.mem f (names_expr e1) && is_tailrec_expr f e2 && is_tailrec_expr f e3
+        | IfThenElse(e1,e2,e3) -> not(StringSet.mem f (names_expr e1)) && is_tailrec_expr f e2 && is_tailrec_expr f e3
         | e -> not(StringSet.mem f (names_expr e));;
 
                             
